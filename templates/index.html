@@ -3,32 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Система ресторана</title>
+    <title>Управление Рестораном</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-        .sidebar { min-height: 100vh; background: white; box-shadow: 2px 0 5px rgba(0,0,0,0.05); }
-        .nav-link { color: #555; cursor: pointer; padding: 15px 20px; font-weight: 500; }
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { min-height: 100vh; background: #fff; box-shadow: 2px 0 10px rgba(0,0,0,0.05); z-index: 100;}
+        .nav-link { color: #555; cursor: pointer; padding: 12px 20px; font-weight: 500; border-radius: 8px; margin: 0 10px 5px 10px; transition: 0.2s;}
         .nav-link:hover { background: #f0f2f5; color: #000; }
-        .nav-link.active { background: #0d6efd; color: white; }
-        .card { border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 12px; }
+        .nav-link.active { background: #0d6efd; color: white; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);}
+        .card { border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border-radius: 12px; }
         .hidden { display: none !important; }
-        .menu-item { cursor: pointer; transition: 0.2s; border: 1px solid #eee; }
-        .menu-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #0d6efd; }
-        .order-closed { opacity: 0.6; background-color: #f9f9f9; }
+        .menu-item { cursor: pointer; transition: 0.2s; border: 2px solid transparent; }
+        .menu-item:hover { transform: translateY(-3px); border-color: #0d6efd; box-shadow: 0 5px 15px rgba(13, 110, 253, 0.15); }
+        .order-closed { opacity: 0.6; background-color: #f8f9fa; }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1055; }
     </style>
 </head>
 <body>
 
+    <!-- ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ -->
+    <div class="toast-container" id="toast-container"></div>
+
     <!-- АВТОРИЗАЦИЯ -->
     <div id="login-screen" class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
         <div class="card p-5" style="width: 400px;">
-            <h3 class="text-center mb-4">Вход в систему</h3>
-            <input type="text" id="username" class="form-control mb-3" placeholder="Логин (admin)">
-            <input type="password" id="password" class="form-control mb-3" placeholder="Пароль (admin123)">
-            <button onclick="login()" class="btn btn-primary w-100 mb-2">Войти</button>
-            <button onclick="loginGuest()" class="btn btn-outline-secondary w-100">Я Гость (Меню)</button>
-            <div id="login-error" class="text-danger text-center mt-3 hidden">Ошибка входа</div>
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary">Клод Моне</h2>
+                <p class="text-muted">Вход в систему</p>
+            </div>
+            <input type="text" id="username" class="form-control mb-3" placeholder="Логин (admin / waiter)">
+            <input type="password" id="password" class="form-control mb-3" placeholder="Пароль">
+            <button onclick="login()" class="btn btn-primary w-100 mb-2 py-2 fw-bold">Войти</button>
+            <button onclick="loginGuest()" class="btn btn-light w-100 text-muted">Войти как Гость</button>
+            <div id="login-error" class="text-danger text-center mt-3 hidden small fw-bold">Неверный логин или пароль</div>
         </div>
     </div>
 
@@ -36,18 +43,19 @@
     <div id="app-screen" class="container-fluid hidden">
         <div class="row">
             <!-- Меню слева -->
-            <div class="col-md-2 sidebar p-0">
-                <div class="p-4 border-bottom">
-                    <h5 class="fw-bold text-primary">Клод Моне</h5>
+            <div class="col-md-2 sidebar p-0 py-3">
+                <div class="px-4 pb-3 mb-3 border-bottom">
+                    <h4 class="fw-bold text-primary mb-0">Клод Моне</h4>
                     <small class="text-muted" id="user-role-display">Роль</small>
                 </div>
-                <nav class="nav flex-column mt-3">
+                <nav class="nav flex-column">
                     <a class="nav-link active" id="link-dashboard" onclick="nav('dashboard')">📊 Главная</a>
-                    <a class="nav-link" id="link-tables" onclick="nav('tables')">🪑 Столики</a>
-                    <a class="nav-link" id="link-reservations" onclick="nav('reservations')">📅 Брони</a>
                     <a class="nav-link" id="link-menu" onclick="nav('menu')">🍔 Меню (Заказ)</a>
-                    <a class="nav-link" id="link-orders" onclick="nav('orders')">👨‍🍳 Заказы</a>
-                    <a class="nav-link text-danger mt-5" onclick="logout()">🚪 Выход</a>
+                    <a class="nav-link" id="link-reservations" onclick="nav('reservations')">📅 Бронирование</a>
+                    <a class="nav-link" id="link-tables" onclick="nav('tables')">🪑 Столики</a>
+                    <a class="nav-link" id="link-orders" onclick="nav('orders')">👨‍🍳 Кухня / Заказы</a>
+                    <a class="nav-link text-warning" id="link-manage-menu" onclick="nav('manage-menu')">⚙️ Редактор меню</a>
+                    <a class="nav-link text-danger mt-5" onclick="logout()">🚪 Выйти</a>
                 </nav>
             </div>
 
@@ -56,65 +64,72 @@
 
                 <!-- ГЛАВНАЯ -->
                 <div id="sec-dashboard">
-                    <h3>Обзор ресторана</h3>
-                    <div class="row mt-4">
-                        <div class="col-md-3"><div class="card p-4 bg-success text-white"><h3>Свободно</h3><h1 id="stat-free">0</h1></div></div>
-                        <div class="col-md-3"><div class="card p-4 bg-danger text-white"><h3>Занято</h3><h1 id="stat-busy">0</h1></div></div>
-                        <div class="col-md-3"><div class="card p-4 bg-primary text-white"><h3>Брони</h3><h1 id="stat-res">0</h1></div></div>
-                        <div class="col-md-3"><div class="card p-4 bg-warning text-dark"><h3>Заказы</h3><h1 id="stat-ord">0</h1></div></div>
+                    <h3 class="mb-4 fw-bold">Обзор ресторана</h3>
+                    <div class="row">
+                        <div class="col-md-3"><div class="card p-4 bg-success text-white"><h5>Свободно столов</h5><h1 class="display-5 fw-bold" id="stat-free">0</h1></div></div>
+                        <div class="col-md-3"><div class="card p-4 bg-danger text-white"><h5>Занято столов</h5><h1 class="display-5 fw-bold" id="stat-busy">0</h1></div></div>
+                        <div class="col-md-3"><div class="card p-4 bg-primary text-white"><h5>Броней на сегодня</h5><h1 class="display-5 fw-bold" id="stat-res">0</h1></div></div>
+                        <div class="col-md-3"><div class="card p-4 bg-warning text-dark"><h5>Активных заказов</h5><h1 class="display-5 fw-bold" id="stat-ord">0</h1></div></div>
                     </div>
                 </div>
 
                 <!-- СТОЛИКИ -->
                 <div id="sec-tables" class="hidden">
-                    <h3>Управление столиками</h3>
+                    <h3 class="mb-4 fw-bold">Схема зала</h3>
                     <div class="row" id="tables-container"></div>
                 </div>
 
                 <!-- БРОНИ -->
                 <div id="sec-reservations" class="hidden">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h3>Бронирования</h3>
-                        <button class="btn btn-primary" onclick="openResModal()">+ Новая бронь</button>
+                    <div class="d-flex justify-content-between mb-4 align-items-center">
+                        <h3 class="fw-bold mb-0">Бронирования</h3>
+                        <button class="btn btn-primary shadow-sm" onclick="openResModal()">+ Забронировать стол</button>
                     </div>
-                    <div class="card p-3">
-                        <table class="table">
-                            <thead><tr><th>ID</th><th>Клиент</th><th>Время</th><th>Стол</th><th>Действия</th></tr></thead>
+                    <div class="card p-0 overflow-hidden">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light"><tr><th>ID</th><th>Имя</th><th>Телефон/Email</th><th>Время</th><th>Стол</th><th>Действия</th></tr></thead>
                             <tbody id="res-list"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- МЕНЮ (ДЛЯ ГОСТЯ) -->
+                <!-- КАССА / МЕНЮ -->
                 <div id="sec-menu" class="hidden">
-                    <h3>Меню ресторана</h3>
-                    <div class="row mb-4" id="menu-container"></div>
-                    <div class="card p-4 bg-light">
-                        <h5>Ваш заказ</h5>
-                        <ul id="cart-list" class="list-group mb-3"><li class="list-group-item text-center">Корзина пуста</li></ul>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h4 class="mb-0">Итого: <span id="cart-total">0</span> ₽</h4>
-                            <div class="d-flex gap-2">
-                                <select id="order-table-select" class="form-select" style="width: 150px;"><option value="">Стол...</option></select>
-                                <button class="btn btn-success" onclick="submitOrder()">Заказать</button>
+                    <h3 class="mb-4 fw-bold">Меню и формирование заказа</h3>
+                    <div class="row">
+                        <div class="col-md-8"><div class="row" id="menu-container"></div></div>
+                        <div class="col-md-4">
+                            <div class="card p-4 bg-white sticky-top" style="top: 20px;">
+                                <h5 class="fw-bold mb-3">Ваш заказ</h5>
+                                <ul id="cart-list" class="list-group list-group-flush mb-3"><li class="list-group-item text-center text-muted">Корзина пуста</li></ul>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-muted">Итого:</span>
+                                    <h3 class="mb-0 fw-bold text-primary"><span id="cart-total">0</span> ₽</h3>
+                                </div>
+                                <select id="order-table-select" class="form-select mb-3"></select>
+                                <button class="btn btn-success w-100 py-2 fw-bold" onclick="submitOrder()">Отправить заказ</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ЗАКАЗЫ (ДЛЯ АДМИНА) -->
+                <!-- РЕДАКТОР МЕНЮ (АДМИН) -->
+                <div id="sec-manage-menu" class="hidden">
+                    <div class="d-flex justify-content-between mb-4 align-items-center">
+                        <h3 class="fw-bold mb-0">Редактор меню</h3>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#menuModal">+ Добавить блюдо</button>
+                    </div>
+                    <div class="row" id="manage-menu-container"></div>
+                </div>
+
+                <!-- ЗАКАЗЫ (КУХНЯ) -->
                 <div id="sec-orders" class="hidden">
-                    <h3>Управление заказами</h3>
-
-                    <h5 class="mt-4 text-warning">⚡ В работе</h5>
-                    <div id="orders-active-container">
-                        <!-- Сюда попадут открытые заказы -->
-                    </div>
-
-                    <h5 class="mt-5 text-secondary">🕒 История (Завершенные)</h5>
-                    <div id="orders-history-container">
-                        <!-- Сюда попадут закрытые заказы -->
-                    </div>
+                    <h3 class="mb-4 fw-bold">Заказы (Кухня)</h3>
+                    <h5 class="text-warning fw-bold mb-3">⚡ Готовятся</h5>
+                    <div id="orders-active-container"></div>
+                    <h5 class="mt-5 text-secondary fw-bold mb-3">🕒 Завершенные</h5>
+                    <div id="orders-history-container"></div>
                 </div>
 
             </div>
@@ -125,13 +140,33 @@
     <div class="modal fade" id="resModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title">Создать бронь</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header"><h5 class="modal-title fw-bold">Забронировать стол</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
-                    <input type="text" id="res-name" class="form-control mb-2" placeholder="Имя клиента">
-                    <input type="datetime-local" id="res-date" class="form-control mb-2">
+                    <input type="text" id="res-name" class="form-control mb-3" placeholder="Ваше Имя">
+                    <input type="text" id="res-phone" class="form-control mb-3" placeholder="Контактный телефон или Email">
+                    <input type="datetime-local" id="res-date" class="form-control mb-3">
                     <select id="res-table" class="form-select"></select>
                 </div>
-                <div class="modal-footer"><button class="btn btn-primary" onclick="createRes()">Сохранить</button></div>
+                <div class="modal-footer"><button class="btn btn-primary" onclick="createRes()">Подтвердить бронь</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА НОВОГО БЛЮДА -->
+    <div class="modal fade" id="menuModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title fw-bold">Новое блюдо</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input type="text" id="new-dish-name" class="form-control mb-3" placeholder="Название блюда">
+                    <input type="number" id="new-dish-price" class="form-control mb-3" placeholder="Цена (₽)">
+                    <select id="new-dish-category" class="form-select mb-3">
+                        <option value="Супы">Супы</option><option value="Горячее">Горячее</option>
+                        <option value="Салаты">Салаты</option><option value="Закуски">Закуски</option>
+                        <option value="Десерты">Десерты</option><option value="Напитки">Напитки</option>
+                    </select>
+                </div>
+                <div class="modal-footer"><button class="btn btn-primary" onclick="addMenuItem()">Добавить</button></div>
             </div>
         </div>
     </div>
@@ -139,19 +174,27 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let currentUser = null;
-        let currentSection = 'dashboard';
-        let cart = [];
+        let currentSection = 'menu';
+        let cart =[];
         const API = 'http://127.0.0.1:5000/api';
 
-        // --- polling ---
+        function showToast(msg, type = 'success') {
+            const toastId = 'toast-' + Date.now();
+            const bgClass = type === 'success' ? 'bg-success' : (type === 'error' ? 'bg-danger' : 'bg-primary');
+            const html = `<div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0 show mb-2" role="alert">
+                <div class="d-flex"><div class="toast-body fw-bold">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+            </div>`;
+            document.getElementById('toast-container').insertAdjacentHTML('beforeend', html);
+            setTimeout(() => { let el = document.getElementById(toastId); if(el) el.classList.remove('show'); }, 3000);
+        }
+
         setInterval(() => {
             if (!currentUser) return;
             if (currentSection === 'dashboard') loadStats();
             if (currentSection === 'tables') loadTables();
             if (currentSection === 'orders') loadOrders();
-        }, 2000);
+        }, 3000);
 
-        // --- auth ---
         async function login() { authReq({username: document.getElementById('username').value, password: document.getElementById('password').value}); }
         function loginGuest() { authReq({username: 'guest', password: ''}); }
 
@@ -161,44 +204,55 @@
                 const data = await res.json();
                 if (res.ok) { currentUser = data.user; initApp(); }
                 else document.getElementById('login-error').classList.remove('hidden');
-            } catch(e) { alert('Ошибка сети'); }
+            } catch(e) { showToast('Ошибка соединения с сервером', 'error'); }
         }
 
         function initApp() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             document.getElementById('user-role-display').innerText = `${currentUser.username} (${currentUser.role})`;
-            if(currentUser.role === 'гость') {
-                document.getElementById('link-orders').classList.add('hidden');
+
+            // Ограничения ролей
+            if(currentUser.role === 'гость') {['link-dashboard','link-orders','link-manage-menu'].forEach(id => document.getElementById(id).classList.add('hidden'));
                 nav('menu');
+            } else if (currentUser.role === 'официант') {
+                ['link-manage-menu'].forEach(id => document.getElementById(id).classList.add('hidden'));
+                nav('dashboard');
             } else {
                 nav('dashboard');
             }
+
             loadMenu();
             loadTableOptions();
+            showToast(`Добро пожаловать, ${currentUser.username}!`);
         }
+
         function logout() { location.reload(); }
 
-        // --- nav ---
         function nav(sec) {
             currentSection = sec;
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-            document.getElementById(`link-${sec}`).classList.add('active');
-            ['dashboard','tables','reservations','menu','orders'].forEach(s => document.getElementById(`sec-${s}`).classList.add('hidden'));
+            document.getElementById(`link-${sec}`).classList.add('active');['dashboard','tables','reservations','menu','orders','manage-menu'].forEach(s => {
+                let el = document.getElementById(`sec-${s}`);
+                if(el) el.classList.add('hidden');
+            });
             document.getElementById(`sec-${sec}`).classList.remove('hidden');
+
             if(sec === 'dashboard') loadStats();
             if(sec === 'tables') loadTables();
             if(sec === 'reservations') loadReservations();
             if(sec === 'orders') loadOrders();
+            if(sec === 'manage-menu') loadManageMenu();
         }
 
-        // --- data ---
         async function loadStats() {
-            const d = await (await fetch(`${API}/stats`)).json();
-            document.getElementById('stat-free').innerText = d.free_tables;
-            document.getElementById('stat-busy').innerText = d.busy_tables;
-            document.getElementById('stat-res').innerText = d.today_reservations;
-            document.getElementById('stat-ord').innerText = d.active_orders;
+            try {
+                const d = await (await fetch(`${API}/stats`)).json();
+                document.getElementById('stat-free').innerText = d.free_tables;
+                document.getElementById('stat-busy').innerText = d.busy_tables;
+                document.getElementById('stat-res').innerText = d.today_reservations;
+                document.getElementById('stat-ord').innerText = d.active_orders;
+            } catch(e){}
         }
 
         async function loadTables() {
@@ -207,137 +261,210 @@
             cont.innerHTML = '';
             tables.forEach(t => {
                 const isFree = t.status === 'свободен';
-                const btn = (currentUser.role !== 'гость') ?
-                    `<button onclick="toggleTable(${t.id}, '${t.status}')" class="btn btn-sm ${isFree?'btn-outline-dark':'btn-outline-danger'} w-100 mt-2">${isFree?'Занять':'Освободить'}</button>` : '';
-                cont.innerHTML += `
-                    <div class="col-md-3 mb-3">
-                        <div class="card p-3 border-top border-4 ${isFree?'border-success':'border-danger'}">
-                            <h5>Стол ${t.table_number}</h5>
-                            <span class="badge ${isFree?'bg-success':'bg-danger'}">${t.status}</span>
-                            ${btn}
-                        </div>
-                    </div>`;
+                const btn = (currentUser.role !== 'гость') ? `<button onclick="toggleTable(${t.id}, '${t.status}')" class="btn btn-sm ${isFree?'btn-outline-dark':'btn-outline-danger'} w-100 mt-3 fw-bold">${isFree?'Занять стол':'Освободить'}</button>` : '';
+                cont.innerHTML += `<div class="col-md-3 mb-4"><div class="card p-3 h-100 border-top border-4 ${isFree?'border-success':'border-danger'}"><h4 class="fw-bold">Стол ${t.table_number}</h4><div><span class="badge ${isFree?'bg-success':'bg-danger'}">${t.status}</span></div><div class="mt-auto">${btn}</div></div></div>`;
             });
         }
+
         async function toggleTable(id, status) {
             const newS = status === 'свободен' ? 'занят' : 'свободен';
             await fetch(`${API}/tables/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status: newS})});
             loadTables();
+            loadStats();
         }
 
-        // --- reservations ---
         async function loadReservations() {
             const data = await (await fetch(`${API}/reservations`)).json();
             const list = document.getElementById('res-list');
             list.innerHTML = '';
+            if(data.length === 0) list.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Нет бронирований</td></tr>';
+
             data.forEach(r => {
-                const delBtn = (currentUser.role === 'администратор') ? `<button onclick="delRes(${r.id})" class="btn btn-sm btn-danger">X</button>` : '';
-                list.innerHTML += `<tr><td>${r.id}</td><td>${r.client_name}</td><td>${r.reservation_datetime}</td><td>Стол ${r.table_number}</td><td>${delBtn}</td></tr>`;
+                const delBtn = (currentUser.role === 'администратор') ? `<button onclick="delRes(${r.id})" class="btn btn-sm btn-outline-danger">Отменить</button>` : '';
+                list.innerHTML += `<tr><td class="text-muted">#${r.id}</td><td class="fw-bold">${r.client_name}</td><td>${r.client_phone || '—'}</td><td>${r.reservation_datetime}</td><td>Стол ${r.table_number}</td><td>${delBtn}</td></tr>`;
             });
         }
+
         function openResModal() { new bootstrap.Modal(document.getElementById('resModal')).show(); loadTableOptions(); }
+
         async function createRes() {
             const body = {
                 client_name: document.getElementById('res-name').value,
+                client_phone: document.getElementById('res-phone').value,
                 datetime: document.getElementById('res-date').value,
                 table_id: document.getElementById('res-table').value,
                 user_id: currentUser.id
             };
-            if(!body.client_name || !body.datetime || !body.table_id) return alert('Заполните все поля');
+            if(!body.client_name || !body.client_phone || !body.datetime || !body.table_id) return showToast('Заполните все поля!', 'error');
             const res = await fetch(`${API}/reservations`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
-            if(res.ok) { bootstrap.Modal.getInstance(document.getElementById('resModal')).hide(); loadReservations(); alert('Готово!'); }
+            if(res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('resModal')).hide();
+                loadReservations();
+                showToast('Столик успешно забронирован!');
+                document.getElementById('res-name').value = '';
+                document.getElementById('res-phone').value = '';
+            } else { showToast('Ошибка создания брони', 'error'); }
         }
-        async function delRes(id) { if(confirm('Удалить?')) await fetch(`${API}/reservations/${id}`, {method:'DELETE'}); loadReservations(); }
 
-        // --- menu ---
+        async function delRes(id) {
+            if(confirm('Отменить бронирование?')) {
+                await fetch(`${API}/reservations/${id}`, {method:'DELETE'});
+                loadReservations(); showToast('Бронь отменена');
+            }
+        }
+
         async function loadMenu() {
             const menu = await (await fetch(`${API}/menu`)).json();
             const cont = document.getElementById('menu-container');
             cont.innerHTML = '';
             menu.forEach(item => {
-                cont.innerHTML += `
-                    <div class="col-md-4 mb-3">
-                        <div class="card p-3 menu-item" onclick="addToCart('${item.name}', ${item.price})">
-                            <div class="d-flex justify-content-between"><h5 class="mb-0">${item.name}</h5><span class="badge bg-primary">${item.price} ₽</span></div>
-                            <small class="text-muted">${item.category}</small>
-                        </div>
-                    </div>`;
+                cont.innerHTML += `<div class="col-md-4 mb-3"><div class="card p-3 menu-item h-100" onclick="addToCart('${item.name}', ${item.price})"><span class="badge bg-light text-dark mb-2 w-auto align-self-start">${item.category}</span><h5 class="fw-bold">${item.name}</h5><h5 class="text-primary mt-auto mb-0">${item.price} ₽</h5></div></div>`;
             });
         }
+
         function addToCart(name, price) {
             const ex = cart.find(i => i.name === name);
             if(ex) ex.quantity++; else cart.push({name, price, quantity: 1});
             renderCart();
         }
+
         function renderCart() {
             const list = document.getElementById('cart-list');
-            list.innerHTML = '';
-            let total = 0;
-            if(cart.length===0) list.innerHTML = '<li class="list-group-item text-center">Пусто</li>';
-            else cart.forEach(i => { total += i.price * i.quantity; list.innerHTML += `<li class="list-group-item d-flex justify-content-between"><span>${i.name} x${i.quantity}</span><span>${i.price*i.quantity} ₽</span></li>`; });
+            list.innerHTML = ''; let total = 0;
+            if(cart.length===0) list.innerHTML = '<li class="list-group-item text-center text-muted">Пусто</li>';
+            else cart.forEach((i, idx) => {
+                total += i.price * i.quantity;
+                list.innerHTML += `<li class="list-group-item d-flex justify-content-between align-items-center px-0"><div><span class="fw-bold">${i.name}</span> <span class="text-muted">x${i.quantity}</span></div><div class="d-flex align-items-center"><span class="me-3">${i.price * i.quantity} ₽</span><button class="btn btn-sm btn-light text-danger" onclick="removeFromCart(${idx})">✖</button></div></li>`;
+            });
             document.getElementById('cart-total').innerText = total;
         }
+
+        function removeFromCart(idx) { cart.splice(idx, 1); renderCart(); }
+
         async function submitOrder() {
             const tid = document.getElementById('order-table-select').value;
-            if(cart.length===0) return alert('Корзина пуста');
-            if(!tid) return alert('Выберите стол');
+            if(cart.length===0) return showToast('Корзина пуста', 'error');
+            if(!tid) return showToast('Пожалуйста, выберите стол', 'error');
+
             const res = await fetch(`${API}/orders`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({table_id: tid, cart: cart, user_id: currentUser.id})});
-            if(res.ok) { alert('Заказ отправлен!'); cart=[]; renderCart(); }
+            if(res.ok) {
+                showToast('Заказ успешно отправлен на кухню!');
+                cart = [];
+                renderCart();
+                loadOrders();
+                loadStats();
+                loadTables();
+            } else {
+                showToast('Ошибка при отправке заказа', 'error');
+            }
         }
+
         async function loadTableOptions() {
-            const t = await (await fetch(`${API}/tables`)).json();
-            const opts = t.map(x => `<option value="${x.id}">Стол ${x.table_number}</option>`).join('');
-            document.getElementById('res-table').innerHTML = opts;
-            document.getElementById('order-table-select').innerHTML = '<option value="">Стол...</option>' + opts;
+            try {
+                const t = await (await fetch(`${API}/tables`)).json();
+                const opts = t.map(x => `<option value="${x.id}">Стол ${x.table_number}</option>`).join('');
+                document.getElementById('res-table').innerHTML = opts;
+                document.getElementById('order-table-select').innerHTML = '<option value="">За какой стол присели?</option>' + opts;
+            } catch(e) {}
         }
 
-        // --- ORDERS LOGIC (NEW) ---
-        async function loadOrders() {
-            const orders = await (await fetch(`${API}/orders`)).json();
-            const activeCont = document.getElementById('orders-active-container');
-            const historyCont = document.getElementById('orders-history-container');
-
-            activeCont.innerHTML = '';
-            historyCont.innerHTML = '';
-
-            let hasActive = false;
-
-            orders.forEach(o => {
-                if (o.status === 'открыт') {
-                    hasActive = true;
-                    activeCont.innerHTML += `
-                        <div class="card p-3 mb-3 border-start border-5 border-warning">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-1">Заказ #${o.id} <span class="badge bg-warning text-dark">В работе</span></h5>
-                                    <div class="text-muted small">🕒 ${o.order_datetime} | 🪑 Стол ${o.table_number}</div>
-                                    <div class="mt-2 fw-bold">${o.dishes}</div>
-                                </div>
-                                <button onclick="closeOrder(${o.id})" class="btn btn-success">Готово</button>
+        // --- УПРАВЛЕНИЕ МЕНЮ (АДМИН) ---
+        async function loadManageMenu() {
+            const menu = await (await fetch(`${API}/menu`)).json();
+            const cont = document.getElementById('manage-menu-container');
+            cont.innerHTML = '';
+            menu.forEach(item => {
+                cont.innerHTML += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card p-3 h-100">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="fw-bold mb-1">${item.name}</h5>
+                                <button onclick="deleteMenuItem(${item.id})" class="btn btn-sm btn-outline-danger">Удалить</button>
                             </div>
-                        </div>`;
-                } else {
-                    // ЗАКРЫТЫЕ ЗАКАЗЫ (ИСТОРИЯ)
-                    historyCont.innerHTML += `
-                        <div class="card p-3 mb-2 order-closed">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1 text-muted">Заказ #${o.id} (Завершен)</h6>
-                                    <div class="small text-muted">🕒 ${o.order_datetime} | 🪑 Стол ${o.table_number}</div>
-                                    <div class="small">${o.dishes}</div>
-                                </div>
-                                <span class="text-success fw-bold">✔</span>
-                            </div>
-                        </div>`;
-                }
+                            <div class="text-primary fw-bold">${item.price} ₽</div>
+                            <small class="text-muted">${item.category}</small>
+                        </div>
+                    </div>`;
             });
+        }
 
-            if (!hasActive) activeCont.innerHTML = '<p class="text-muted">Нет активных заказов</p>';
+        async function addMenuItem() {
+            const body = {
+                name: document.getElementById('new-dish-name').value,
+                price: document.getElementById('new-dish-price').value,
+                category: document.getElementById('new-dish-category').value
+            };
+            if(!body.name || !body.price) return showToast('Заполните данные блюда', 'error');
+
+            const res = await fetch(`${API}/menu`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+            if(res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('menuModal')).hide();
+                loadManageMenu();
+                loadMenu();
+                showToast('Блюдо добавлено в базу!');
+            } else {
+                showToast('Ошибка: возможно такое блюдо уже есть', 'error');
+            }
+        }
+
+        async function deleteMenuItem(id) {
+            if(confirm('Удалить это блюдо из меню навсегда?')) {
+                await fetch(`${API}/menu/${id}`, {method:'DELETE'});
+                loadManageMenu();
+                loadMenu();
+                showToast('Блюдо удалено');
+            }
+        }
+
+        // --- ЛОГИКА ЗАКАЗОВ (КУХНЯ) ---
+        async function loadOrders() {
+            try {
+                const orders = await (await fetch(`${API}/orders`)).json();
+                const activeCont = document.getElementById('orders-active-container');
+                const historyCont = document.getElementById('orders-history-container');
+
+                activeCont.innerHTML = '';
+                historyCont.innerHTML = '';
+
+                let hasActive = false;
+                orders.forEach(o => {
+                    if (o.status === 'открыт') {
+                        hasActive = true;
+                        activeCont.innerHTML += `
+                            <div class="card p-3 mb-3 border-start border-5 border-warning shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold">Заказ #${o.id} <span class="badge bg-warning text-dark ms-2">В работе</span></h5>
+                                        <div class="text-muted small mb-2">🕒 ${o.order_datetime} | 🪑 Стол ${o.table_number}</div>
+                                        <div class="fs-5 text-dark">${o.dishes}</div>
+                                    </div>
+                                    <button onclick="closeOrder(${o.id})" class="btn btn-success px-4 fw-bold">Готово!</button>
+                                </div>
+                            </div>`;
+                    } else {
+                        historyCont.innerHTML += `
+                            <div class="card p-3 mb-2 order-closed border-0 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1 text-muted">Заказ #${o.id} (Завершен)</h6>
+                                        <div class="small text-muted">Стол ${o.table_number} | ${o.dishes}</div>
+                                    </div>
+                                    <span class="text-success fw-bold">✔</span>
+                                </div>
+                            </div>`;
+                    }
+                });
+                if (!hasActive) activeCont.innerHTML = '<p class="text-muted italic">На данный момент активных заказов нет</p>';
+            } catch(e) {}
         }
 
         async function closeOrder(id) {
-            await fetch(`${API}/orders/${id}/close`, {method:'PUT'});
-            loadOrders(); // Обновится моментально и заказ улетит в историю
+            const res = await fetch(`${API}/orders/${id}/close`, {method:'PUT'});
+            if(res.ok) {
+                showToast('Заказ завершен');
+                loadOrders();
+                loadStats();
+            }
         }
     </script>
 </body>
